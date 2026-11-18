@@ -1,0 +1,766 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DFX SCRIPTS • Sub2Unlock Hub</title>
+  <style>
+    :root {
+      --bg: #070709;
+      --bg-card: #0f0f14;
+      --bg-elevated: #16161e;
+      --red: #ff1e38;
+      --red-dark: #a60d20;
+      --red-glow: rgba(255, 30, 56, 0.38);
+      --text: #f5f5f7;
+      --muted: #9a9aa8;
+      --border: rgba(255, 30, 56, 0.25);
+      --green: #16c767;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    /* Animated Cyber Grid & Red Glow Orbs */
+    .bg-grid {
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(255, 30, 56, 0.06) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 30, 56, 0.06) 1px, transparent 1px);
+      background-size: 42px 42px;
+      z-index: -2;
+      animation: gridPan 18s linear infinite;
+    }
+
+    .bg-orb {
+      position: fixed;
+      width: 460px;
+      height: 460px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(255, 30, 56, 0.22), transparent 70%);
+      filter: blur(40px);
+      z-index: -1;
+      pointer-events: none;
+      animation: floatOrb 9s ease-in-out infinite alternate;
+    }
+
+    .bg-orb.orb-2 {
+      right: -120px;
+      bottom: -120px;
+      animation-delay: -4s;
+    }
+
+    @keyframes gridPan {
+      0% { transform: translateY(0); }
+      100% { transform: translateY(42px); }
+    }
+
+    @keyframes floatOrb {
+      0% { transform: translate(-80px, -60px) scale(0.95); }
+      100% { transform: translate(60px, 50px) scale(1.12); }
+    }
+
+    @keyframes pulseBorder {
+      0%, 100% { box-shadow: 0 0 18px rgba(255, 30, 56, 0.22); }
+      50% { box-shadow: 0 0 32px rgba(255, 30, 56, 0.5); }
+    }
+
+    @keyframes fadeSlideUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Header */
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      background: rgba(7, 7, 9, 0.85);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      padding: 14px 22px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
+    }
+
+    .brand-badge {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, var(--red), var(--red-dark));
+      display: grid;
+      place-items: center;
+      font-weight: 900;
+      box-shadow: 0 0 18px var(--red-glow);
+    }
+
+    .brand h1 {
+      font-size: 1.15rem;
+      letter-spacing: 0.8px;
+      font-weight: 800;
+    }
+
+    .brand span {
+      color: var(--red);
+    }
+
+    .nav-actions {
+      display: flex;
+      gap: 10px;
+    }
+
+    .btn {
+      border: 1px solid var(--border);
+      background: var(--bg-elevated);
+      color: var(--text);
+      padding: 9px 15px;
+      border-radius: 10px;
+      font-weight: 700;
+      font-size: 0.88rem;
+      cursor: pointer;
+      transition: transform 0.16s ease, box-shadow 0.2s ease, background 0.2s ease;
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+      border-color: var(--red);
+      box-shadow: 0 0 18px var(--red-glow);
+    }
+
+    .btn-red {
+      background: linear-gradient(135deg, var(--red), var(--red-dark));
+      border-color: var(--red);
+      color: #fff;
+    }
+
+    .btn-green {
+      background: linear-gradient(135deg, #16c767, #0d8a46);
+      border-color: #16c767;
+      color: #fff;
+    }
+
+    /* Container */
+    .container {
+      max-width: 1040px;
+      margin: 0 auto;
+      padding: 28px 18px 60px;
+    }
+
+    /* Hero & Search */
+    .hero {
+      text-align: center;
+      margin-bottom: 28px;
+      animation: fadeSlideUp 0.45s ease;
+    }
+
+    .hero h2 {
+      font-size: clamp(1.75rem, 4vw, 2.5rem);
+      font-weight: 900;
+      margin-bottom: 8px;
+    }
+
+    .hero h2 span {
+      color: var(--red);
+      text-shadow: 0 0 22px var(--red-glow);
+    }
+
+    .hero p {
+      color: var(--muted);
+      font-size: 0.96rem;
+      margin-bottom: 20px;
+    }
+
+    .search-wrap {
+      max-width: 560px;
+      margin: 0 auto;
+      position: relative;
+    }
+
+    .search-wrap input {
+      width: 100%;
+      padding: 14px 18px;
+      border-radius: 14px;
+      border: 1px solid var(--border);
+      background: var(--bg-card);
+      color: var(--text);
+      font-size: 0.96rem;
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    .search-wrap input:focus {
+      border-color: var(--red);
+      box-shadow: 0 0 24px var(--red-glow);
+    }
+
+    /* Script Grid */
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 18px;
+    }
+
+    .card {
+      background: linear-gradient(180deg, var(--bg-card), #0b0b0f);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 14px;
+      transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+      animation: fadeSlideUp 0.4s ease;
+    }
+
+    .card:hover {
+      transform: translateY(-4px);
+      border-color: var(--red);
+      box-shadow: 0 10px 28px rgba(255, 30, 56, 0.22);
+    }
+
+    .tag {
+      display: inline-block;
+      font-size: 0.74rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      color: var(--red);
+      background: rgba(255, 30, 56, 0.12);
+      border: 1px solid rgba(255, 30, 56, 0.3);
+      padding: 4px 9px;
+      border-radius: 999px;
+      margin-bottom: 8px;
+    }
+
+    .card h3 {
+      font-size: 1.12rem;
+      margin-bottom: 6px;
+    }
+
+    .card p {
+      color: var(--muted);
+      font-size: 0.88rem;
+      line-height: 1.45;
+    }
+
+    /* Unlock View (Separate Page State via ?id=...) */
+    .unlock-box {
+      max-width: 620px;
+      margin: 12px auto 0;
+      background: var(--bg-card);
+      border: 1px solid var(--red);
+      border-radius: 18px;
+      padding: 24px;
+      animation: pulseBorder 3s infinite, fadeSlideUp 0.35s ease;
+    }
+
+    .progress-bar {
+      width: 100%;
+      height: 10px;
+      background: #1b1b24;
+      border-radius: 999px;
+      overflow: hidden;
+      margin: 14px 0 20px;
+    }
+
+    .progress-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, var(--red-dark), var(--red));
+      transition: width 0.35s ease;
+    }
+
+    .step-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .step-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      background: var(--bg-elevated);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      padding: 13px 15px;
+      border-radius: 12px;
+      transition: border-color 0.2s;
+    }
+
+    .step-item.done {
+      border-color: var(--green);
+      background: rgba(22, 199, 103, 0.08);
+    }
+
+    .step-info strong {
+      display: block;
+      font-size: 0.95rem;
+    }
+
+    .step-info small {
+      color: var(--muted);
+      font-size: 0.8rem;
+    }
+
+    .code-output {
+      margin-top: 16px;
+      background: #060608;
+      border: 1px solid var(--green);
+      border-radius: 12px;
+      padding: 14px;
+      display: none;
+    }
+
+    .code-output pre {
+      white-space: pre-wrap;
+      word-break: break-all;
+      font-family: Consolas, monospace;
+      font-size: 0.85rem;
+      color: #86efac;
+      margin-bottom: 12px;
+      max-height: 220px;
+      overflow-y: auto;
+    }
+
+    /* Admin Post Modal */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.8);
+      backdrop-filter: blur(6px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      z-index: 50;
+    }
+
+    .modal {
+      width: 100%;
+      max-width: 540px;
+      background: var(--bg-card);
+      border: 1px solid var(--red);
+      border-radius: 18px;
+      padding: 22px;
+      max-height: 90vh;
+      overflow-y: auto;
+      animation: fadeSlideUp 0.25s ease;
+    }
+
+    .modal h3 {
+      margin-bottom: 14px;
+      color: var(--red);
+    }
+
+    .field {
+      margin-bottom: 12px;
+    }
+
+    .field label {
+      display: block;
+      font-size: 0.82rem;
+      color: var(--muted);
+      margin-bottom: 5px;
+      font-weight: 600;
+    }
+
+    .field input,
+    .field textarea {
+      width: 100%;
+      background: var(--bg-elevated);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 10px;
+      padding: 10px 12px;
+      color: var(--text);
+      font-size: 0.9rem;
+      outline: none;
+    }
+
+    .field input:focus,
+    .field textarea:focus {
+      border-color: var(--red);
+    }
+
+    .hidden {
+      display: none !important;
+    }
+  </style>
+</head>
+<body>
+  <div class="bg-grid"></div>
+  <div class="bg-orb"></div>
+  <div class="bg-orb orb-2"></div>
+
+  <header>
+    <div class="brand" onclick="goHome()">
+      <div class="brand-badge">DFX</div>
+      <h1>DFX <span>SCRIPTS</span></h1>
+    </div>
+    <div class="nav-actions">
+      <button class="btn" onclick="goHome()">All Scripts</button>
+      <button class="btn btn-red" onclick="openModal()">+ Post Script</button>
+    </div>
+  </header>
+
+  <main class="container">
+    <!-- HOME / SEARCH VIEW -->
+    <section id="homeView">
+      <div class="hero">
+        <h2>UNLOCK PREMIUM <span>SCRIPTS</span></h2>
+        <p>Search any script below, complete the quick creator steps, and copy instantly.</p>
+        <div class="search-wrap">
+          <input
+            type="text"
+            id="searchInput"
+            placeholder="🔍 Search scripts by game, name, or feature..."
+            oninput="renderScripts()"
+          />
+        </div>
+      </div>
+      <div id="scriptsGrid" class="grid"></div>
+    </section>
+
+    <!-- UNLOCK PAGE VIEW -->
+    <section id="unlockView" class="hidden">
+      <button class="btn" onclick="goHome()" style="margin-bottom:14px;">← Back to Scripts</button>
+      <div class="unlock-box">
+        <span class="tag" id="unlockGameTag">GAME</span>
+        <h2 id="unlockTitle" style="margin-bottom:6px;">Script Title</h2>
+        <p id="unlockDesc" style="color:var(--muted);font-size:0.9rem;">Complete all steps below to unlock the script.</p>
+
+        <div class="progress-bar">
+          <div class="progress-fill" id="progressFill"></div>
+        </div>
+
+        <div id="stepList" class="step-list"></div>
+
+        <button id="finalUnlockBtn" class="btn btn-red" style="width:100%;padding:13px;font-size:1rem;" disabled onclick="revealScript()">
+          🔒 Complete All Steps to Unlock
+        </button>
+
+        <div id="codeOutput" class="code-output">
+          <pre id="scriptCodeBox"></pre>
+          <button id="copyBtn" class="btn btn-green" style="width:100%;" onclick="copyScript()">
+            📋 Copy Script
+          </button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- POST / EXPORT NEW SCRIPT MODAL -->
+  <div id="postModal" class="modal-backdrop">
+    <div class="modal">
+      <h3>➕ Add New Unlock Script</h3>
+      <div class="field">
+        <label>Script Name *</label>
+        <input id="inTitle" placeholder="e.g. Blox Fruits Auto Farm V4" />
+      </div>
+      <div class="field">
+        <label>Game / Category *</label>
+        <input id="inGame" placeholder="e.g. Roblox • Blox Fruits" />
+      </div>
+      <div class="field">
+        <label>Short Description</label>
+        <input id="inDesc" placeholder="Fast auto-farm, ESP, boss hunt & keyless." />
+      </div>
+      <div class="field">
+        <label>YouTube Channel Link (Subscribe)</label>
+        <input id="inYtSub" placeholder="https://youtube.com/@YourChannel?sub_confirmation=1" />
+      </div>
+      <div class="field">
+        <label>YouTube Video Link (Like & Comment)</label>
+        <input id="inYtVid" placeholder="https://youtube.com/watch?v=..." />
+      </div>
+      <div class="field">
+        <label>Discord Server Invite Link (Join Discord)</label>
+        <input id="inDiscord" placeholder="https://discord.gg/yourinvite" />
+      </div>
+      <div class="field">
+        <label>Script Code *</label>
+        <textarea id="inCode" rows="4" placeholder='loadstring(game:HttpGet("https://..."))()'></textarea>
+      </div>
+
+      <div style="display:flex;gap:10px;margin-top:14px;">
+        <button class="btn btn-red" style="flex:1;" onclick="previewAndGenerateEntry()">Preview & Generate Code</button>
+        <button class="btn" onclick="closeModal()">Close</button>
+      </div>
+
+      <div id="exportWrap" class="hidden" style="margin-top:14px;">
+        <p style="font-size:0.82rem;color:#86efac;margin-bottom:6px;">
+          Added to your preview! To make it live for <b>everyone</b> on GitHub Pages, copy this block into <code>scripts.js</code>:
+        </p>
+        <textarea id="exportBox" rows="6" readonly style="font-family:Consolas,monospace;font-size:0.8rem;"></textarea>
+        <button class="btn btn-green" style="width:100%;margin-top:8px;" onclick="copyExportSnippet()">📋 Copy Entry for scripts.js</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Load shared scripts database -->
+  <script src="scripts.js"></script>
+  <script>
+    const LOCAL_KEY = 'dfx_local_scripts_v1';
+    let currentScript = null;
+    let completedSteps = new Set();
+
+    function getAllScripts() {
+      const base = Array.isArray(window.DFX_SCRIPTS) ? window.DFX_SCRIPTS : [];
+      let local = [];
+      try {
+        local = JSON.parse(localStorage.getItem(LOCAL_KEY) || '[]');
+      } catch {}
+      return [...local, ...base];
+    }
+
+    function buildSteps(script) {
+      const steps = [];
+      if (script.youtubeChannel) {
+        steps.push({ id: 'sub', label: 'Subscribe on YouTube', sub: 'Subscribe to the creator channel', url: script.youtubeChannel, icon: '🔴' });
+      }
+      if (script.youtubeVideo) {
+        steps.push({ id: 'like', label: 'Like the YouTube Video', sub: 'Open the video and drop a like', url: script.youtubeVideo, icon: '👍' });
+        steps.push({ id: 'comment', label: 'Comment on the Video', sub: 'Leave a comment on the video', url: script.youtubeVideo, icon: '💬' });
+      }
+      if (script.discord) {
+        steps.push({ id: 'discord', label: 'Join Discord Server', sub: 'Join our community server', url: script.discord, icon: '🟣' });
+      }
+      return steps;
+    }
+
+    function renderScripts() {
+      const query = (document.getElementById('searchInput').value || '').toLowerCase().trim();
+      const grid = document.getElementById('scriptsGrid');
+      const list = getAllScripts().filter(
+        (s) =>
+          s.title.toLowerCase().includes(query) ||
+          (s.game || '').toLowerCase().includes(query) ||
+          (s.description || '').toLowerCase().includes(query)
+      );
+
+      if (!list.length) {
+        grid.innerHTML = `<p style="color:var(--muted);grid-column:1/-1;text-align:center;">No scripts matched "${query}".</p>`;
+        return;
+      }
+
+      grid.innerHTML = list
+        .map(
+          (s) => `
+          <div class="card">
+            <div>
+              <span class="tag">${escapeHtml(s.game || 'SCRIPT')}</span>
+              <h3>${escapeHtml(s.title)}</h3>
+              <p>${escapeHtml(s.description || 'Complete the creator steps to unlock this script.')}</p>
+            </div>
+            <button class="btn btn-red" style="width:100%;" onclick="openUnlock('${encodeURIComponent(s.id)}')">
+              🔓 Get Script
+            </button>
+          </div>
+        `
+        )
+        .join('');
+    }
+
+    function openUnlock(encodedId) {
+      const id = decodeURIComponent(encodedId);
+      const url = new URL(window.location.href);
+      url.searchParams.set('id', id);
+      window.history.pushState({}, '', url);
+      loadRoute();
+    }
+
+    function goHome() {
+      const url = new URL(window.location.href);
+      url.searchParams.delete('id');
+      window.history.pushState({}, '', url);
+      loadRoute();
+    }
+
+    function loadRoute() {
+      const id = new URLSearchParams(window.location.search).get('id');
+      const homeView = document.getElementById('homeView');
+      const unlockView = document.getElementById('unlockView');
+
+      if (!id) {
+        unlockView.classList.add('hidden');
+        homeView.classList.remove('hidden');
+        renderScripts();
+        return;
+      }
+
+      const found = getAllScripts().find((s) => s.id === id);
+      if (!found) {
+        goHome();
+        return;
+      }
+
+      currentScript = found;
+      completedSteps = new Set();
+      homeView.classList.add('hidden');
+      unlockView.classList.remove('hidden');
+
+      document.getElementById('unlockGameTag').textContent = found.game || 'SCRIPT';
+      document.getElementById('unlockTitle').textContent = found.title;
+      document.getElementById('unlockDesc').textContent = found.description || 'Complete every step below to unlock.';
+      document.getElementById('codeOutput').style.display = 'none';
+      document.getElementById('scriptCodeBox').textContent = found.code;
+
+      renderUnlockSteps();
+    }
+
+    function renderUnlockSteps() {
+      const steps = buildSteps(currentScript);
+      const listEl = document.getElementById('stepList');
+
+      listEl.innerHTML = steps
+        .map((st) => {
+          const isDone = completedSteps.has(st.id);
+          return `
+            <div class="step-item ${isDone ? 'done' : ''}" id="row_${st.id}">
+              <div class="step-info">
+                <strong>${st.icon} ${st.label}</strong>
+                <small id="status_${st.id}">${isDone ? 'Completed ✓' : st.sub}</small>
+              </div>
+              <button class="btn ${isDone ? 'btn-green' : 'btn-red'}" id="btn_${st.id}" onclick="triggerStep('${st.id}', '${encodeURIComponent(st.url)}')">
+                ${isDone ? 'Done ✓' : 'Complete'}
+              </button>
+            </div>
+          `;
+        })
+        .join('');
+
+      updateProgress(steps.length);
+    }
+
+    function triggerStep(stepId, encodedUrl) {
+      window.open(decodeURIComponent(encodedUrl), '_blank', 'noopener');
+      const btn = document.getElementById(`btn_${stepId}`);
+      const status = document.getElementById(`status_${stepId}`);
+      if (btn.disabled) return;
+
+      btn.disabled = true;
+      let sec = 5;
+      status.textContent = `Verifying action... (${sec}s)`;
+      btn.textContent = `${sec}s`;
+
+      const timer = setInterval(() => {
+        sec -= 1;
+        if (sec > 0) {
+          status.textContent = `Verifying action... (${sec}s)`;
+          btn.textContent = `${sec}s`;
+        } else {
+          clearInterval(timer);
+          completedSteps.add(stepId);
+          renderUnlockSteps();
+        }
+      }, 1000);
+    }
+
+    function updateProgress(totalSteps) {
+      const pct = totalSteps === 0 ? 100 : Math.round((completedSteps.size / totalSteps) * 100);
+      document.getElementById('progressFill').style.width = `${pct}%`;
+
+      const unlockBtn = document.getElementById('finalUnlockBtn');
+      if (completedSteps.size >= totalSteps) {
+        unlockBtn.disabled = false;
+        unlockBtn.className = 'btn btn-green';
+        unlockBtn.textContent = '🔓 Unlock Script Now';
+      } else {
+        unlockBtn.disabled = true;
+        unlockBtn.className = 'btn btn-red';
+        unlockBtn.textContent = `🔒 Complete Steps (${completedSteps.size}/${totalSteps})`;
+      }
+    }
+
+    function revealScript() {
+      const out = document.getElementById('codeOutput');
+      out.style.display = 'block';
+      out.scrollIntoView({ behavior: 'smooth' });
+    }
+
+    async function copyScript() {
+      if (!currentScript) return;
+      await navigator.clipboard.writeText(currentScript.code);
+      const btn = document.getElementById('copyBtn');
+      btn.textContent = '✅ Copied to Clipboard!';
+      setTimeout(() => (btn.textContent = '📋 Copy Script'), 2000);
+    }
+
+    function openModal() {
+      document.getElementById('postModal').style.display = 'flex';
+    }
+
+    function closeModal() {
+      document.getElementById('postModal').style.display = 'none';
+    }
+
+    function previewAndGenerateEntry() {
+      const title = document.getElementById('inTitle').value.trim();
+      const game = document.getElementById('inGame').value.trim();
+      const description = document.getElementById('inDesc').value.trim();
+      const youtubeChannel = document.getElementById('inYtSub').value.trim();
+      const youtubeVideo = document.getElementById('inYtVid').value.trim();
+      const discord = document.getElementById('inDiscord').value.trim();
+      const code = document.getElementById('inCode').value.trim();
+
+      if (!title || !code) {
+        alert('Please enter at least a Script Name and Script Code.');
+        return;
+      }
+
+      const id = title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') + '-' + Date.now().toString().slice(-4);
+      const entry = { id, title, game: game || 'ROBLOX', description, youtubeChannel, youtubeVideo, discord, code };
+
+      const existing = JSON.parse(localStorage.getItem(LOCAL_KEY) || '[]');
+      existing.unshift(entry);
+      localStorage.setItem(LOCAL_KEY, JSON.stringify(existing));
+
+      document.getElementById('exportBox').value = JSON.stringify(entry, null, 2) + ',';
+      document.getElementById('exportWrap').classList.remove('hidden');
+      renderScripts();
+    }
+
+    async function copyExportSnippet() {
+      const box = document.getElementById('exportBox');
+      await navigator.clipboard.writeText(box.value);
+      alert('Copied! Paste this inside window.DFX_SCRIPTS = [ ... ] in your scripts.js file on GitHub.');
+    }
+
+    function escapeHtml(str) {
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+    }
+
+    window.addEventListener('popstate', loadRoute);
+    loadRoute();
+  </script>
+</body>
+</html>
+
